@@ -4,6 +4,7 @@ use bevy::prelude::*;
 
 const PLAYER_SPRITE: &str = "player_a_01.png";
 const LASER_SPRITE: &str = "laser_a_01.png";
+const SCALE: f32 = 0.5;
 const TIME_STEP: f32 = 1. / 60.;
 
 // Entity, Component, System, Resource
@@ -86,7 +87,7 @@ fn player_spawn(mut commands: Commands, materials: Res<Materials>, win_size: Res
 			material: materials.player.clone(),
 			transform: Transform {
 				translation: Vec3::new(0., bottom + 75. / 4. + 5., 10.),
-				scale: Vec3::new(0.5, 0.5, 1.),
+				scale: Vec3::new(SCALE, SCALE, 1.),
 				..Default::default()
 			},
 			..Default::default()
@@ -122,17 +123,26 @@ fn player_fire(
 		if ready_fire.0 && kb.pressed(KeyCode::Space) {
 			let x = player_tf.translation.x;
 			let y = player_tf.translation.y;
-			commands
-				.spawn_bundle(SpriteBundle {
-					material: materials.laser.clone(),
-					transform: Transform {
-						translation: Vec3::new(x, y + 15., 0.),
+
+			let mut spawn_lasers = |x_offset: f32| {
+				commands
+					.spawn_bundle(SpriteBundle {
+						material: materials.laser.clone(),
+						transform: Transform {
+							translation: Vec3::new(x + x_offset, y + 15., 0.),
+							scale: Vec3::new(SCALE, SCALE, 1.),
+							..Default::default()
+						},
 						..Default::default()
-					},
-					..Default::default()
-				})
-				.insert(Laser)
-				.insert(Speed::default());
+					})
+					.insert(Laser)
+					.insert(Speed::default());
+			};
+
+			let x_offset = 144.0 / 4.0 - 5.0;
+			spawn_lasers(x_offset);
+			spawn_lasers(-x_offset);
+
 			ready_fire.0 = false;
 		}
 
