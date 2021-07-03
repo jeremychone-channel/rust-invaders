@@ -3,7 +3,7 @@
 mod enemy;
 mod player;
 
-use bevy::prelude::*;
+use bevy::{prelude::*, sprite::collide_aabb::collide};
 use enemy::EnemyPlugin;
 use player::PlayerPlugin;
 
@@ -58,6 +58,7 @@ fn main() {
 		.add_plugin(PlayerPlugin)
 		.add_plugin(EnemyPlugin)
 		.add_startup_system(setup.system())
+		.add_system(laser_hit_enemy.system())
 		.run();
 }
 
@@ -85,4 +86,33 @@ fn setup(
 
 	// position window
 	window.set_position(IVec2::new(3870, 4830));
+}
+
+fn laser_hit_enemy(
+	mut commands: Commands,
+	mut laser_query: Query<(Entity, &Transform, &Sprite, With<Laser>)>,
+	mut enemy_query: Query<(Entity, &Transform, &Sprite, With<Enemy>)>,
+	mut active_enemies: ResMut<ActiveEnemies>,
+) {
+	for (laser_entity, laser_tf, laser_sprite, _) in laser_query.iter_mut() {
+		for (enemy_entity, enemy_tf, enemy_sprite, _) in enemy_query.iter_mut() {
+			let laser_scale = Vec2::from(laser_tf.scale);
+			let enemy_scale = Vec2::from(enemy_tf.scale);
+			let collision = collide(
+				laser_tf.translation,
+				laser_sprite.size * laser_scale,
+				enemy_tf.translation,
+				enemy_sprite.size * enemy_scale,
+			);
+
+			if let Some(_) = collision {
+				// remove the enemy
+				commands.entity(enemy_entity).despawn();
+				active_enemies.0 -= 1;
+
+				// remove the laser
+				commands.entity(laser_entity).despawn();
+			}
+		}
+	}
 }
