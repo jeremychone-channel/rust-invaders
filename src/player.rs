@@ -37,9 +37,9 @@ fn player_spawn(mut commands: Commands, materials: Res<Materials>, win_size: Res
 
 fn player_movement(
 	keyboard_input: Res<Input<KeyCode>>,
-	mut query: Query<(&Speed, &mut Transform, With<Player>)>,
+	mut query: Query<(&Speed, &mut Transform), With<Player>>,
 ) {
-	if let Ok((speed, mut transform, _)) = query.single_mut() {
+	if let Ok((speed, mut transform)) = query.single_mut() {
 		let dir = if keyboard_input.pressed(KeyCode::Left) {
 			-1.
 		} else if keyboard_input.pressed(KeyCode::Right) {
@@ -55,9 +55,9 @@ fn player_fire(
 	mut commands: Commands,
 	kb: Res<Input<KeyCode>>,
 	materials: Res<Materials>,
-	mut query: Query<(&Transform, &mut PlayerReadyFire, With<Player>)>,
+	mut query: Query<(&Transform, &mut PlayerReadyFire), With<Player>>,
 ) {
-	if let Ok((player_tf, mut ready_fire, _)) = query.single_mut() {
+	if let Ok((player_tf, mut ready_fire)) = query.single_mut() {
 		if ready_fire.0 && kb.pressed(KeyCode::Space) {
 			let x = player_tf.translation.x;
 			let y = player_tf.translation.y;
@@ -93,9 +93,9 @@ fn player_fire(
 fn laser_movement(
 	mut commands: Commands,
 	win_size: Res<WinSize>,
-	mut query: Query<(Entity, &Speed, &mut Transform, With<Laser>)>,
+	mut query: Query<(Entity, &Speed, &mut Transform), With<Laser>>,
 ) {
-	for (laser_entity, speed, mut laser_tf, _) in query.iter_mut() {
+	for (laser_entity, speed, mut laser_tf) in query.iter_mut() {
 		let translation = &mut laser_tf.translation;
 		translation.y += speed.0 * TIME_STEP;
 		if translation.y > win_size.h {

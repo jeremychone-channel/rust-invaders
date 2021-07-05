@@ -51,7 +51,9 @@ impl Default for Speed {
 
 fn main() {
 	App::build()
-		.insert_resource(ClearColor(Color::rgb(0.04, 0.04, 0.04)))
+		.insert_resource(ClearColor(Color::rgb(
+			0.04, 0.04, 0.04,
+		)))
 		.insert_resource(WindowDescriptor {
 			title: "Rust Invaders!".to_string(),
 			width: 598.0,
@@ -83,11 +85,19 @@ fn setup(
 
 	// create the main resources
 	let texture_handle = asset_server.load(EXPLOSION_SHEET);
-	let texture_atlas = TextureAtlas::from_grid(texture_handle, Vec2::new(64.0, 64.0), 4, 4);
+	let texture_atlas = TextureAtlas::from_grid(
+		texture_handle,
+		Vec2::new(64.0, 64.0),
+		4,
+		4,
+	);
 	commands.insert_resource(Materials {
-		player: materials.add(asset_server.load(PLAYER_SPRITE).into()),
-		laser: materials.add(asset_server.load(LASER_SPRITE).into()),
-		enemy: materials.add(asset_server.load(ENEMY_SPRITE).into()),
+		player: materials
+			.add(asset_server.load(PLAYER_SPRITE).into()),
+		laser: materials
+			.add(asset_server.load(LASER_SPRITE).into()),
+		enemy: materials
+			.add(asset_server.load(ENEMY_SPRITE).into()),
 		explosion: texture_atlases.add(texture_atlas),
 	});
 	commands.insert_resource(WinSize {
@@ -101,12 +111,22 @@ fn setup(
 
 fn laser_hit_enemy(
 	mut commands: Commands,
-	mut laser_query: Query<(Entity, &Transform, &Sprite, With<Laser>)>,
-	mut enemy_query: Query<(Entity, &Transform, &Sprite, With<Enemy>)>,
+	laser_query: Query<
+		(Entity, &Transform, &Sprite),
+		With<Laser>,
+	>,
+	enemy_query: Query<
+		(Entity, &Transform, &Sprite),
+		With<Enemy>,
+	>,
 	mut active_enemies: ResMut<ActiveEnemies>,
 ) {
-	for (laser_entity, laser_tf, laser_sprite, _) in laser_query.iter_mut() {
-		for (enemy_entity, enemy_tf, enemy_sprite, _) in enemy_query.iter_mut() {
+	for (laser_entity, laser_tf, laser_sprite) in
+		laser_query.iter()
+	{
+		for (enemy_entity, enemy_tf, enemy_sprite) in
+			enemy_query.iter()
+		{
 			let laser_scale = Vec2::from(laser_tf.scale);
 			let enemy_scale = Vec2::from(enemy_tf.scale);
 			let collision = collide(
@@ -125,9 +145,9 @@ fn laser_hit_enemy(
 				commands.entity(laser_entity).despawn();
 
 				// spawn explosion to spawn
-				commands
-					.spawn()
-					.insert(ExplosionToSpawn(enemy_tf.translation.clone()));
+				commands.spawn().insert(ExplosionToSpawn(
+					enemy_tf.translation.clone(),
+				));
 			}
 		}
 	}
@@ -138,7 +158,9 @@ fn explosion_to_spawn(
 	query: Query<(Entity, &ExplosionToSpawn)>,
 	materials: Res<Materials>,
 ) {
-	for (explosion_spawn_entity, explosion_to_spawn) in query.iter() {
+	for (explosion_spawn_entity, explosion_to_spawn) in
+		query.iter()
+	{
 		commands
 			.spawn_bundle(SpriteSheetBundle {
 				texture_atlas: materials.explosion.clone(),
@@ -159,20 +181,30 @@ fn animate_explosion(
 	mut commands: Commands,
 	time: Res<Time>,
 	texture_atlases: Res<Assets<TextureAtlas>>,
-	mut query: Query<(
-		Entity,
-		&mut Timer,
-		&mut TextureAtlasSprite,
-		&Handle<TextureAtlas>,
+	mut query: Query<
+		(
+			Entity,
+			&mut Timer,
+			&mut TextureAtlasSprite,
+			&Handle<TextureAtlas>,
+		),
 		With<Explosion>,
-	)>,
+	>,
 ) {
-	for (entity, mut timer, mut sprite, texture_atlas_handle, _) in query.iter_mut() {
+	for (
+		entity,
+		mut timer,
+		mut sprite,
+		texture_atlas_handle,
+	) in query.iter_mut()
+	{
 		timer.tick(time.delta());
 		if timer.finished() {
-			let texture_atlas = texture_atlases.get(texture_atlas_handle).unwrap();
+			let texture_atlas =
+				texture_atlases.get(texture_atlas_handle).unwrap();
 			sprite.index += 1;
-			if sprite.index == texture_atlas.textures.len() as u32 {
+			if sprite.index == texture_atlas.textures.len() as u32
+			{
 				commands.entity(entity).despawn()
 			}
 		}
