@@ -1,15 +1,17 @@
-[Video Tutorial](https://youtu.be/Yb3vInxzKGE)
 Simple RUST Game using the [Bevy Engine](https://bevyengine.org/)
 
-Full coding sessions and RUST Tutorial on [YouTube](https://www.youtube.com/jeremychone)
 
-- [Episode 1]() - Rust Game from Scratch with Bevy Engine
-- Episode 2 - (coming soon) One canon per claws, enemy, explosion
+- YouTube videos for this code base:
+    - [Episode 1](https://youtu.be/Yb3vInxzKGE) - Rust Game Development tutorial from Scratch with Bevy Engine
+    - [Episode 2](https://youtu.be/Dl4PJG0eRhg) - bi-lasers, enemy spawn, explosion animation
+- Other Rust videos:
+    - Weekly Rust Videos at [Jeremy Chone](https://www.youtube.com/jeremychone) channel
+    - [Rust Game Development Tutorials](https://youtube.com/playlist?list=PL7r-PXl6ZPcCB_9zZFU0krBoGK3y5f5Vt)
 
 
 ## Rust & Bevy & Other Resources
 
-- RUST: 
+- Rust: 
     - [Rust Book](https://doc.rust-lang.org/book/)
     - [Rust Video Course](https://www.youtube.com/playlist?list=PL7r-PXl6ZPcB4jn1_VR3D8tSK9DxOaiQE)
 - Bevy: 
