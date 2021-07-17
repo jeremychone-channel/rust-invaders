@@ -67,7 +67,8 @@ fn main() {
 		.add_plugin(PlayerPlugin)
 		.add_plugin(EnemyPlugin)
 		.add_startup_system(setup.system())
-		.add_system(laser_hit_enemy.system())
+		.add_system(player_laser_hit_enemy.system())
+		.add_system(enemy_laser_hit_player.system())
 		.add_system(explosion_to_spawn.system())
 		.add_system(animate_explosion.system())
 		.run();
@@ -104,7 +105,7 @@ fn setup(
 	window.set_position(IVec2::new(3870, 4830));
 }
 
-fn laser_hit_enemy(
+fn player_laser_hit_enemy(
 	mut commands: Commands,
 	laser_query: Query<(Entity, &Transform, &Sprite), (With<Laser>, With<FromPlayer>)>,
 	enemy_query: Query<(Entity, &Transform, &Sprite), With<Enemy>>,
@@ -133,6 +134,38 @@ fn laser_hit_enemy(
 				commands
 					.spawn()
 					.insert(ExplosionToSpawn(enemy_tf.translation.clone()));
+			}
+		}
+	}
+}
+
+fn enemy_laser_hit_player(
+	mut commands: Commands,
+	laser_query: Query<(Entity, &Transform, &Sprite), (With<Laser>, With<FromEnemy>)>,
+	player_query: Query<(Entity, &Transform, &Sprite), With<Player>>,
+) {
+	if let Ok((player_entity, player_tf, player_sprite)) = player_query.single() {
+		let player_size = player_sprite.size * Vec2::from(player_tf.scale.abs());
+		// for each enemy laser
+		for (laser_entity, laser_tf, laser_sprite) in laser_query.iter() {
+			let laser_size = laser_sprite.size * Vec2::from(laser_tf.scale.abs());
+			// compute the collision
+			let collision = collide(
+				laser_tf.translation,
+				laser_size,
+				player_tf.translation,
+				player_size,
+			);
+			// process collision
+			if let Some(_) = collision {
+				// remove the player
+				commands.entity(player_entity).despawn();
+				// remove the laser
+				commands.entity(laser_entity).despawn();
+				// spawn the ExplosionToSpawn entity
+				commands
+					.spawn()
+					.insert(ExplosionToSpawn(player_tf.translation.clone()));
 			}
 		}
 	}
