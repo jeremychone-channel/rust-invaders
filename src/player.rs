@@ -1,6 +1,8 @@
 use bevy::prelude::*;
 
-use crate::{Laser, Materials, Player, PlayerReadyFire, Speed, WinSize, SCALE, TIME_STEP};
+use crate::{
+	FromPlayer, Laser, Materials, Player, PlayerReadyFire, Speed, WinSize, SCALE, TIME_STEP,
+};
 
 pub struct PlayerPlugin;
 
@@ -65,7 +67,7 @@ fn player_fire(
 			let mut spawn_lasers = |x_offset: f32| {
 				commands
 					.spawn_bundle(SpriteBundle {
-						material: materials.laser.clone(),
+						material: materials.player_laser.clone(),
 						transform: Transform {
 							translation: Vec3::new(x + x_offset, y + 15., 0.),
 							scale: Vec3::new(SCALE, SCALE, 1.),
@@ -74,6 +76,7 @@ fn player_fire(
 						..Default::default()
 					})
 					.insert(Laser)
+					.insert(FromPlayer)
 					.insert(Speed::default());
 			};
 
@@ -93,7 +96,7 @@ fn player_fire(
 fn laser_movement(
 	mut commands: Commands,
 	win_size: Res<WinSize>,
-	mut query: Query<(Entity, &Speed, &mut Transform), With<Laser>>,
+	mut query: Query<(Entity, &Speed, &mut Transform), (With<Laser>, With<FromPlayer>)>,
 ) {
 	for (laser_entity, speed, mut laser_tf) in query.iter_mut() {
 		let translation = &mut laser_tf.translation;
