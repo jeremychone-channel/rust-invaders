@@ -3,6 +3,8 @@
 mod enemy;
 mod player;
 
+use std::collections::HashSet;
+
 use bevy::{prelude::*, sprite::collide_aabb::collide};
 use enemy::EnemyPlugin;
 use player::PlayerPlugin;
@@ -12,7 +14,7 @@ const PLAYER_LASER_SPRITE: &str = "laser_a_01.png";
 const ENEMY_SPRITE: &str = "enemy_a_01.png";
 const ENEMY_LASER_SPRITE: &str = "laser_b_01.png";
 const EXPLOSION_SHEET: &str = "explo_a_sheet.png";
-const SCALE: f32 = 0.5;
+const SCALE: f32 = 1.;
 const TIME_STEP: f32 = 1. / 60.;
 const MAX_ENEMIES: u32 = 1;
 
@@ -111,6 +113,8 @@ fn player_laser_hit_enemy(
 	enemy_query: Query<(Entity, &Transform, &Sprite), With<Enemy>>,
 	mut active_enemies: ResMut<ActiveEnemies>,
 ) {
+	let mut enemies_blasted: HashSet<Entity> = HashSet::new();
+
 	for (laser_entity, laser_tf, laser_sprite) in laser_query.iter() {
 		for (enemy_entity, enemy_tf, enemy_sprite) in enemy_query.iter() {
 			let laser_scale = Vec2::from(laser_tf.scale);
@@ -123,17 +127,21 @@ fn player_laser_hit_enemy(
 			);
 
 			if let Some(_) = collision {
-				// remove the enemy
-				commands.entity(enemy_entity).despawn();
-				active_enemies.0 -= 1;
+				if enemies_blasted.get(&enemy_entity).is_none() {
+					// remove the enemy
+					commands.entity(enemy_entity).despawn();
+					active_enemies.0 -= 1;
+
+					// spawn explosion to spawn
+					commands
+						.spawn()
+						.insert(ExplosionToSpawn(enemy_tf.translation.clone()));
+
+					enemies_blasted.insert(enemy_entity);
+				}
 
 				// remove the laser
 				commands.entity(laser_entity).despawn();
-
-				// spawn explosion to spawn
-				commands
-					.spawn()
-					.insert(ExplosionToSpawn(enemy_tf.translation.clone()));
 			}
 		}
 	}
