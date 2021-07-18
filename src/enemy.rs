@@ -1,3 +1,5 @@
+use std::f32::consts::PI;
+
 use crate::{
 	ActiveEnemies, Enemy, FromEnemy, Laser, Materials, Speed, WinSize, MAX_ENEMIES, SCALE, TIME_STEP,
 };
@@ -10,6 +12,7 @@ impl Plugin for EnemyPlugin {
 	fn build(&self, app: &mut bevy::prelude::AppBuilder) {
 		app
 			.add_system(enemy_laser_movement.system())
+			.add_system(enemy_movement.system())
 			.add_system_set(
 				SystemSet::new()
 					.with_run_criteria(FixedTimestep::step(1.0))
@@ -48,9 +51,50 @@ fn enemy_spawn(
 				},
 				..Default::default()
 			})
-			.insert(Enemy);
+			.insert(Enemy)
+			.insert(Speed::default());
 
 		active_enemies.0 += 1;
+	}
+}
+
+fn enemy_movement(time: Res<Time>, mut query: Query<(&mut Transform, &Speed), With<Enemy>>) {
+	let now = time.seconds_since_startup() as f32;
+	// for each enemy
+	for (mut tf, speed) in query.iter_mut() {
+		let max_distance = TIME_STEP * speed.0;
+		let x_org = tf.translation.x;
+		let y_org = tf.translation.y;
+
+		// Get the ellipse
+		let (x_offset, y_offset) = (0., 100.);
+		let (x_radius, y_radius) = (150., 100.);
+
+		// Compute the next angle
+		let angle = speed.0 * TIME_STEP * now % 360. / PI;
+
+		// Calculate the destination
+		let x_dst = x_radius * angle.cos() + x_offset;
+		let y_dst = y_radius * angle.sin() + y_offset;
+		// Calculate the distance
+		let dx = x_org - x_dst;
+		let dy = y_org - y_dst;
+		let distance = (dx * dx + dy * dy).sqrt();
+		let distance_ratio = if distance == 0. {
+			0.
+		} else {
+			max_distance / distance
+		};
+
+		// calculate the final x/y (make sure to not overshoot)
+		let x = x_org - dx * distance_ratio;
+		let x = if dx > 0. { x.max(x_dst) } else { x.min(x_dst) };
+		let y = y_org - dy * distance_ratio;
+		let y = if dy > 0. { y.max(y_dst) } else { y.min(y_dst) };
+
+		// apply to tranformation
+		tf.translation.x = x;
+		tf.translation.y = y;
 	}
 }
 
