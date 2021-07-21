@@ -5,6 +5,7 @@ Fast dev: `cargo watch -q -c -x 'run --features bevy/dynamic'`
 - YouTube videos for this code base:
     - [Episode 1](https://youtu.be/Yb3vInxzKGE) - Rust Game Development tutorial from Scratch with Bevy Engine
     - [Episode 2](https://youtu.be/Dl4PJG0eRhg) - bi-lasers, enemy spawn, explosion animation
+    - [Episode 3](https://youtu.be/4nEUX2hf2ZI) - Enemy Approach, Formation, and Laser
 - Other Rust videos:
     - Weekly Rust Videos at [Jeremy Chone](https://www.youtube.com/jeremychone) channel
     - [Rust Game Development Tutorials](https://youtube.com/playlist?list=PL7r-PXl6ZPcCB_9zZFU0krBoGK3y5f5Vt)
