@@ -129,7 +129,8 @@ fn setup(
 	});
 
 	// position window
-	window.set_position(IVec2::new(3870, 4830));
+	// Commented out - when recording tutorial (place as you see fit)
+	// window.set_position(IVec2::new(3870, 4830));
 }
 
 fn player_laser_hit_enemy(
