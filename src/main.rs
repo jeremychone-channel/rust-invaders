@@ -249,7 +249,7 @@ fn animate_explosion(
 			let texture_atlas = texture_atlases.get(texture_atlas_handle).unwrap();
 			sprite.index += 1;
 			if sprite.index == texture_atlas.textures.len() as u32 {
-				commands.entity(entity).despawn()
+				commands.entity(entity).despawn();
 			}
 		}
 	}
