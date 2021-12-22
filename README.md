@@ -1,6 +1,13 @@
 Simple RUST Game using the [Bevy Engine](https://bevyengine.org/)
 
-Fast dev: `cargo watch -q -c -x 'run --features bevy/dynamic'`
+### MacOS Setup
+
+- Delete the Cargo.lock, as it may otherwise raise an error the first time: `rm Cargo.lock`
+- Install Cmake with [Homebrew](https://brew.sh/): `brew install cmake`
+
+### Development
+
+For rapid development: `cargo watch -q -c -x 'run --features bevy/dynamic'`
 
 - YouTube videos for this code base:
     - [Episode 1](https://youtu.be/Yb3vInxzKGE) - Rust Game Development tutorial from Scratch with Bevy Engine
