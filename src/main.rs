@@ -60,18 +60,27 @@ impl PlayerState {
 // endregion: Resources
 
 // region:    Components
+#[derive(Component)]
 struct Laser;
 
+#[derive(Component)]
 struct Player;
+#[derive(Component)]
 struct PlayerReadyFire(bool);
+#[derive(Component)]
 struct FromPlayer;
 
+#[derive(Component)]
 struct Enemy;
+#[derive(Component)]
 struct FromEnemy;
 
+#[derive(Component)]
 struct Explosion;
+#[derive(Component)]
 struct ExplosionToSpawn(Vec3);
 
+#[derive(Component)]
 struct Speed(f32);
 impl Default for Speed {
 	fn default() -> Self {
@@ -81,7 +90,7 @@ impl Default for Speed {
 // endregion: Components
 
 fn main() {
-	App::build()
+	App::new()
 		.insert_resource(ClearColor(Color::rgb(0.04, 0.04, 0.04)))
 		.insert_resource(WindowDescriptor {
 			title: "Rust Invaders!".to_string(),
@@ -180,7 +189,7 @@ fn enemy_laser_hit_player(
 	laser_query: Query<(Entity, &Transform, &Sprite), (With<Laser>, With<FromEnemy>)>,
 	player_query: Query<(Entity, &Transform, &Sprite), With<Player>>,
 ) {
-	if let Ok((player_entity, player_tf, player_sprite)) = player_query.single() {
+	if let Ok((player_entity, player_tf, player_sprite)) = player_query.get_single() {
 		let player_size = player_sprite.size * Vec2::from(player_tf.scale.abs());
 		// for each enemy laser
 		for (laser_entity, laser_tf, laser_sprite) in laser_query.iter() {
@@ -249,7 +258,7 @@ fn animate_explosion(
 		if timer.finished() {
 			let texture_atlas = texture_atlases.get(texture_atlas_handle).unwrap();
 			sprite.index += 1;
-			if sprite.index == texture_atlas.textures.len() as u32 {
+			if sprite.index == texture_atlas.textures.len() {
 				commands.entity(entity).despawn();
 			}
 		}

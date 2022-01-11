@@ -8,7 +8,7 @@ use crate::{
 pub struct PlayerPlugin;
 
 impl Plugin for PlayerPlugin {
-	fn build(&self, app: &mut AppBuilder) {
+	fn build(&self, app: &mut App) {
 		app
 			.insert_resource(PlayerState::default())
 			.add_startup_stage(
@@ -61,7 +61,7 @@ fn player_movement(
 	keyboard_input: Res<Input<KeyCode>>,
 	mut query: Query<(&Speed, &mut Transform), With<Player>>,
 ) {
-	if let Ok((speed, mut transform)) = query.single_mut() {
+	if let Ok((speed, mut transform)) = query.get_single_mut() {
 		let dir = if keyboard_input.pressed(KeyCode::Left) {
 			-1.
 		} else if keyboard_input.pressed(KeyCode::Right) {
@@ -79,7 +79,7 @@ fn player_fire(
 	materials: Res<Materials>,
 	mut query: Query<(&Transform, &mut PlayerReadyFire), With<Player>>,
 ) {
-	if let Ok((player_tf, mut ready_fire)) = query.single_mut() {
+	if let Ok((player_tf, mut ready_fire)) = query.get_single_mut() {
 		if ready_fire.0 && kb.pressed(KeyCode::Space) {
 			let x = player_tf.translation.x;
 			let y = player_tf.translation.y;

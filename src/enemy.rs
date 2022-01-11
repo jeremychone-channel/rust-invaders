@@ -11,7 +11,7 @@ pub struct EnemyPlugin;
 
 // region:    Formation
 // Component
-#[derive(Default, Clone)]
+#[derive(Component, Default, Clone)]
 struct Formation {
 	start: (f32, f32),
 	radius: (f32, f32),
@@ -80,7 +80,7 @@ impl FormationMaker {
 // endregion: Formation
 
 impl Plugin for EnemyPlugin {
-	fn build(&self, app: &mut bevy::prelude::AppBuilder) {
+	fn build(&self, app: &mut App) {
 		app
 			.insert_resource(FormationMaker::default())
 			.add_system(enemy_laser_movement.system())
