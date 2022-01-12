@@ -1,8 +1,8 @@
 use bevy::{core::FixedTimestep, prelude::*};
 
 use crate::{
-	FromPlayer, Laser, Materials, Player, PlayerReadyFire, PlayerState, Speed, WinSize,
-	PLAYER_RESPAWN_DELAY, SCALE, TIME_STEP,
+	Art, FromPlayer, Laser, Player, PlayerReadyFire, PlayerState, Speed, WinSize,
+	PLAYER_LASER_SPRITE_META, PLAYER_RESPAWN_DELAY, PLAYER_SPRITE_META, SCALE, TIME_STEP,
 };
 
 pub struct PlayerPlugin;
@@ -28,7 +28,7 @@ impl Plugin for PlayerPlugin {
 
 fn player_spawn(
 	mut commands: Commands,
-	materials: Res<Materials>,
+	art: Res<Art>,
 	win_size: Res<WinSize>,
 	time: Res<Time>,
 	mut player_state: ResMut<PlayerState>,
@@ -39,9 +39,15 @@ fn player_spawn(
 	// spawn a sprite
 	if !player_state.on && (last_shot == 0. || now > last_shot + PLAYER_RESPAWN_DELAY) {
 		let bottom = -win_size.h / 2.;
+		let (_, player_sprite_size) = PLAYER_SPRITE_META;
+
 		commands
 			.spawn_bundle(SpriteBundle {
-				material: materials.player.clone(),
+				sprite: Sprite {
+					custom_size: Some(Vec2::from(player_sprite_size)),
+					..Default::default()
+				},
+				texture: art.player.clone(),
 				transform: Transform {
 					translation: Vec3::new(0., bottom + 75. / 4. + 5., 10.),
 					scale: Vec3::new(SCALE, SCALE, 1.),
@@ -76,18 +82,22 @@ fn player_movement(
 fn player_fire(
 	mut commands: Commands,
 	kb: Res<Input<KeyCode>>,
-	materials: Res<Materials>,
+	art: Res<Art>,
 	mut query: Query<(&Transform, &mut PlayerReadyFire), With<Player>>,
 ) {
 	if let Ok((player_tf, mut ready_fire)) = query.get_single_mut() {
 		if ready_fire.0 && kb.pressed(KeyCode::Space) {
 			let x = player_tf.translation.x;
 			let y = player_tf.translation.y;
-
+			let (_, player_laser_sprite_size) = PLAYER_LASER_SPRITE_META;
 			let mut spawn_lasers = |x_offset: f32| {
 				commands
 					.spawn_bundle(SpriteBundle {
-						material: materials.player_laser.clone(),
+						sprite: Sprite {
+							custom_size: Some(Vec2::from(player_laser_sprite_size)),
+							..Default::default()
+						},
+						texture: art.player_laser.clone(),
 						transform: Transform {
 							translation: Vec3::new(x + x_offset, y + 15., 0.),
 							scale: Vec3::new(SCALE, SCALE, 1.),

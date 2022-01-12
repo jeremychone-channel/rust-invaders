@@ -1,8 +1,8 @@
 use std::f32::consts::PI;
 
 use crate::{
-	ActiveEnemies, Enemy, FromEnemy, Laser, Materials, Speed, WinSize, MAX_ENEMIES,
-	MAX_FORMATION_MEMBERS, SCALE, TIME_STEP,
+	ActiveEnemies, Art, Enemy, FromEnemy, Laser, Speed, WinSize, ENEMY_LASER_SPRITE_META,
+	ENEMY_SPRITE_META, MAX_ENEMIES, MAX_FORMATION_MEMBERS, SCALE, TIME_STEP,
 };
 use bevy::{core::FixedTimestep, prelude::*};
 use rand::{thread_rng, Rng};
@@ -103,7 +103,7 @@ fn enemy_spawn(
 	mut active_enemies: ResMut<ActiveEnemies>,
 	mut formation_maker: ResMut<FormationMaker>,
 	win_size: Res<WinSize>,
-	materials: Res<Materials>,
+	materials: Res<Art>,
 ) {
 	if active_enemies.0 < MAX_ENEMIES {
 		// get the formation and start x/y
@@ -111,9 +111,14 @@ fn enemy_spawn(
 		let (x, y) = formation.start;
 
 		// spawn enemy
+		let (_, enemy_sprite_size) = ENEMY_SPRITE_META;
 		commands
 			.spawn_bundle(SpriteBundle {
-				material: materials.enemy.clone(),
+				sprite: Sprite {
+					custom_size: Some(Vec2::from(enemy_sprite_size)),
+					..Default::default()
+				},
+				texture: materials.enemy.clone(),
 				transform: Transform {
 					translation: Vec3::new(x, y, 10.0),
 					scale: Vec3::new(SCALE, SCALE, 1.),
@@ -176,7 +181,7 @@ fn enemy_movement(mut query: Query<(&mut Transform, &Speed, &mut Formation), Wit
 
 fn enemy_fire(
 	mut commands: Commands,
-	materials: Res<Materials>,
+	materials: Res<Art>,
 	enemy_query: Query<&Transform, With<Enemy>>,
 ) {
 	// for each enemy shoot laser
@@ -184,9 +189,14 @@ fn enemy_fire(
 		let x = tf.translation.x;
 		let y = tf.translation.y;
 		// spawn enemy laser sprite
+		let (_, enemy_laser_sprite_size) = ENEMY_LASER_SPRITE_META;
 		commands
 			.spawn_bundle(SpriteBundle {
-				material: materials.enemy_laser.clone(),
+				sprite: Sprite {
+					custom_size: Some(Vec2::from(enemy_laser_sprite_size)),
+					..Default::default()
+				},
+				texture: materials.enemy_laser.clone(),
 				transform: Transform {
 					translation: Vec3::new(x, y - 15., 0.),
 					scale: Vec3::new(SCALE, -SCALE, 1.),

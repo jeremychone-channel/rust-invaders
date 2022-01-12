@@ -9,10 +9,10 @@ use bevy::{prelude::*, sprite::collide_aabb::collide};
 use enemy::EnemyPlugin;
 use player::PlayerPlugin;
 
-const PLAYER_SPRITE: &str = "player_a_01.png";
-const PLAYER_LASER_SPRITE: &str = "laser_a_01.png";
-const ENEMY_SPRITE: &str = "enemy_a_01.png";
-const ENEMY_LASER_SPRITE: &str = "laser_b_01.png";
+const PLAYER_SPRITE_META: (&str, (f32, f32)) = ("player_a_01.png", (144.0, 75.0));
+const PLAYER_LASER_SPRITE_META: (&str, (f32, f32)) = ("laser_a_01.png", (9.0, 54.0));
+const ENEMY_SPRITE_META: (&str, (f32, f32)) = ("enemy_a_01.png", (93.0, 84.0));
+const ENEMY_LASER_SPRITE_META: (&str, (f32, f32)) = ("laser_b_01.png", (17.0, 55.0));
 const EXPLOSION_SHEET: &str = "explo_a_sheet.png";
 const SCALE: f32 = 0.5;
 const TIME_STEP: f32 = 1. / 60.;
@@ -21,11 +21,11 @@ const MAX_FORMATION_MEMBERS: u32 = 2;
 const PLAYER_RESPAWN_DELAY: f64 = 2.;
 
 // region:    Resources
-pub struct Materials {
-	player: Handle<ColorMaterial>,
-	player_laser: Handle<ColorMaterial>,
-	enemy: Handle<ColorMaterial>,
-	enemy_laser: Handle<ColorMaterial>,
+pub struct Art {
+	player: Handle<Image>,
+	player_laser: Handle<Image>,
+	enemy: Handle<Image>,
+	enemy_laser: Handle<Image>,
 	explosion: Handle<TextureAtlas>,
 }
 struct WinSize {
@@ -102,18 +102,17 @@ fn main() {
 		.add_plugins(DefaultPlugins)
 		.add_plugin(PlayerPlugin)
 		.add_plugin(EnemyPlugin)
-		.add_startup_system(setup.system())
-		.add_system(player_laser_hit_enemy.system())
-		.add_system(enemy_laser_hit_player.system())
-		.add_system(explosion_to_spawn.system())
-		.add_system(animate_explosion.system())
+		.add_startup_system(setup)
+		.add_system(player_laser_hit_enemy)
+		.add_system(enemy_laser_hit_player)
+		.add_system(explosion_to_spawn)
+		.add_system(animate_explosion)
 		.run();
 }
 
 fn setup(
 	mut commands: Commands,
 	asset_server: Res<AssetServer>,
-	mut materials: ResMut<Assets<ColorMaterial>>,
 	mut texture_atlases: ResMut<Assets<TextureAtlas>>,
 	mut windows: ResMut<Windows>,
 ) {
@@ -122,14 +121,20 @@ fn setup(
 	// camera
 	commands.spawn_bundle(OrthographicCameraBundle::new_2d());
 
+	let (player_sprite_name, _) = PLAYER_SPRITE_META;
+	let (player_laser_sprite_name, _) = PLAYER_LASER_SPRITE_META;
+	let (enemy_sprite_name, _) = ENEMY_SPRITE_META;
+	let (enemy_laser_sprite_name, _) = ENEMY_LASER_SPRITE_META;
+
 	// create the main resources
 	let texture_handle = asset_server.load(EXPLOSION_SHEET);
 	let texture_atlas = TextureAtlas::from_grid(texture_handle, Vec2::new(64.0, 64.0), 4, 4);
-	commands.insert_resource(Materials {
-		player: materials.add(asset_server.load(PLAYER_SPRITE).into()),
-		player_laser: materials.add(asset_server.load(PLAYER_LASER_SPRITE).into()),
-		enemy: materials.add(asset_server.load(ENEMY_SPRITE).into()),
-		enemy_laser: materials.add(asset_server.load(ENEMY_LASER_SPRITE).into()),
+
+	commands.insert_resource(Art {
+		player: asset_server.load(player_sprite_name),
+		player_laser: asset_server.load(player_laser_sprite_name),
+		enemy: asset_server.load(enemy_sprite_name),
+		enemy_laser: asset_server.load(enemy_laser_sprite_name),
 		explosion: texture_atlases.add(texture_atlas),
 	});
 	commands.insert_resource(WinSize {
@@ -152,13 +157,13 @@ fn player_laser_hit_enemy(
 
 	for (laser_entity, laser_tf, laser_sprite) in laser_query.iter() {
 		for (enemy_entity, enemy_tf, enemy_sprite) in enemy_query.iter() {
-			let laser_scale = Vec2::from(laser_tf.scale);
-			let enemy_scale = Vec2::from(enemy_tf.scale);
+			let laser_scale = Vec2::new(laser_tf.scale.x, laser_tf.scale.y);
+			let enemy_scale = Vec2::new(enemy_tf.scale.x, enemy_tf.scale.y);
 			let collision = collide(
 				laser_tf.translation,
-				laser_sprite.size * laser_scale,
+				laser_sprite.custom_size.unwrap() * laser_scale,
 				enemy_tf.translation,
-				enemy_sprite.size * enemy_scale,
+				enemy_sprite.custom_size.unwrap() * enemy_scale,
 			);
 
 			if let Some(_) = collision {
@@ -190,10 +195,12 @@ fn enemy_laser_hit_player(
 	player_query: Query<(Entity, &Transform, &Sprite), With<Player>>,
 ) {
 	if let Ok((player_entity, player_tf, player_sprite)) = player_query.get_single() {
-		let player_size = player_sprite.size * Vec2::from(player_tf.scale.abs());
+		let player_size =
+			player_sprite.custom_size.unwrap() * Vec2::new(player_tf.scale.x, player_tf.scale.y).abs();
 		// for each enemy laser
 		for (laser_entity, laser_tf, laser_sprite) in laser_query.iter() {
-			let laser_size = laser_sprite.size * Vec2::from(laser_tf.scale.abs());
+			let laser_size =
+				laser_sprite.custom_size.unwrap() * Vec2::new(laser_tf.scale.x, laser_tf.scale.y).abs();
 			// compute the collision
 			let collision = collide(
 				laser_tf.translation,
@@ -220,12 +227,12 @@ fn enemy_laser_hit_player(
 fn explosion_to_spawn(
 	mut commands: Commands,
 	query: Query<(Entity, &ExplosionToSpawn)>,
-	materials: Res<Materials>,
+	art: Res<Art>,
 ) {
 	for (explosion_spawn_entity, explosion_to_spawn) in query.iter() {
 		commands
 			.spawn_bundle(SpriteSheetBundle {
-				texture_atlas: materials.explosion.clone(),
+				texture_atlas: art.explosion.clone(),
 				transform: Transform {
 					translation: explosion_to_spawn.0,
 					..Default::default()
