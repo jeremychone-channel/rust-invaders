@@ -1,14 +1,13 @@
-use bevy::{core::FixedTimestep, prelude::*};
-
 use crate::{
-	FromPlayer, Laser, Materials, Player, PlayerReadyFire, PlayerState, Speed, WinSize,
+	FromPlayer, Laser, Player, PlayerReadyFire, PlayerState, Speed, SpriteInfos, WinSize,
 	PLAYER_RESPAWN_DELAY, SCALE, TIME_STEP,
 };
+use bevy::{core::FixedTimestep, prelude::*};
 
 pub struct PlayerPlugin;
 
 impl Plugin for PlayerPlugin {
-	fn build(&self, app: &mut AppBuilder) {
+	fn build(&self, app: &mut App) {
 		app
 			.insert_resource(PlayerState::default())
 			.add_startup_stage(
@@ -28,7 +27,7 @@ impl Plugin for PlayerPlugin {
 
 fn player_spawn(
 	mut commands: Commands,
-	materials: Res<Materials>,
+	sprite_infos: Res<SpriteInfos>,
 	win_size: Res<WinSize>,
 	time: Res<Time>,
 	mut player_state: ResMut<PlayerState>,
@@ -36,12 +35,11 @@ fn player_spawn(
 	let now = time.seconds_since_startup();
 	let last_shot = player_state.last_shot;
 
-	// spawn a sprite
 	if !player_state.on && (last_shot == 0. || now > last_shot + PLAYER_RESPAWN_DELAY) {
 		let bottom = -win_size.h / 2.;
 		commands
 			.spawn_bundle(SpriteBundle {
-				material: materials.player.clone(),
+				texture: sprite_infos.player.0.clone(),
 				transform: Transform {
 					translation: Vec3::new(0., bottom + 75. / 4. + 5., 10.),
 					scale: Vec3::new(SCALE, SCALE, 1.),
@@ -61,7 +59,7 @@ fn player_movement(
 	keyboard_input: Res<Input<KeyCode>>,
 	mut query: Query<(&Speed, &mut Transform), With<Player>>,
 ) {
-	if let Ok((speed, mut transform)) = query.single_mut() {
+	if let Ok((speed, mut transform)) = query.get_single_mut() {
 		let dir = if keyboard_input.pressed(KeyCode::Left) {
 			-1.
 		} else if keyboard_input.pressed(KeyCode::Right) {
@@ -76,10 +74,10 @@ fn player_movement(
 fn player_fire(
 	mut commands: Commands,
 	kb: Res<Input<KeyCode>>,
-	materials: Res<Materials>,
+	textures: Res<SpriteInfos>,
 	mut query: Query<(&Transform, &mut PlayerReadyFire), With<Player>>,
 ) {
-	if let Ok((player_tf, mut ready_fire)) = query.single_mut() {
+	if let Ok((player_tf, mut ready_fire)) = query.get_single_mut() {
 		if ready_fire.0 && kb.pressed(KeyCode::Space) {
 			let x = player_tf.translation.x;
 			let y = player_tf.translation.y;
@@ -87,7 +85,7 @@ fn player_fire(
 			let mut spawn_lasers = |x_offset: f32| {
 				commands
 					.spawn_bundle(SpriteBundle {
-						material: materials.player_laser.clone(),
+						texture: textures.player_laser.0.clone(),
 						transform: Transform {
 							translation: Vec3::new(x + x_offset, y + 15., 0.),
 							scale: Vec3::new(SCALE, SCALE, 1.),

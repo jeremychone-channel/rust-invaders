@@ -1,6 +1,10 @@
+## **IMPORTANT** - 2022-01-28 - Code has been updated to **Bevy v0.6** !!!
+
 Simple RUST Game using the [Bevy Engine](https://bevyengine.org/)
 
 Fast dev: `cargo watch -q -c -x 'run --features bevy/dynamic'`
+
+
 
 - YouTube videos for this code base:
     - [Episode 1](https://youtu.be/Yb3vInxzKGE) - Rust Game Development tutorial from Scratch with Bevy Engine

@@ -1,22 +1,22 @@
-use std::f32::consts::PI;
-
 use crate::{
-	ActiveEnemies, Enemy, FromEnemy, Laser, Materials, Speed, WinSize, MAX_ENEMIES,
+	ActiveEnemies, Enemy, FromEnemy, Laser, Speed, SpriteInfos, WinSize, MAX_ENEMIES,
 	MAX_FORMATION_MEMBERS, SCALE, TIME_STEP,
 };
 use bevy::{core::FixedTimestep, prelude::*};
 use rand::{thread_rng, Rng};
+use std::f32::consts::PI;
 
 pub struct EnemyPlugin;
 
 // region:    Formation
 // Component
-#[derive(Default, Clone)]
+#[derive(Default, Clone, Component)]
 struct Formation {
 	start: (f32, f32),
 	radius: (f32, f32),
 	offset: (f32, f32),
 	angle: f32,
+	#[allow(unused)] // for now, not using group_id
 	group_id: u32,
 }
 
@@ -80,7 +80,7 @@ impl FormationMaker {
 // endregion: Formation
 
 impl Plugin for EnemyPlugin {
-	fn build(&self, app: &mut bevy::prelude::AppBuilder) {
+	fn build(&self, app: &mut bevy::prelude::App) {
 		app
 			.insert_resource(FormationMaker::default())
 			.add_system(enemy_laser_movement.system())
@@ -103,7 +103,7 @@ fn enemy_spawn(
 	mut active_enemies: ResMut<ActiveEnemies>,
 	mut formation_maker: ResMut<FormationMaker>,
 	win_size: Res<WinSize>,
-	materials: Res<Materials>,
+	materials: Res<SpriteInfos>,
 ) {
 	if active_enemies.0 < MAX_ENEMIES {
 		// get the formation and start x/y
@@ -113,7 +113,7 @@ fn enemy_spawn(
 		// spawn enemy
 		commands
 			.spawn_bundle(SpriteBundle {
-				material: materials.enemy.clone(),
+				texture: materials.enemy.0.clone(),
 				transform: Transform {
 					translation: Vec3::new(x, y, 10.0),
 					scale: Vec3::new(SCALE, SCALE, 1.),
@@ -129,7 +129,7 @@ fn enemy_spawn(
 	}
 }
 
-fn enemy_movement(mut query: Query<(&mut Transform, &Speed, &mut Formation), With<Enemy>>) {
+fn enemy_movement(mut query: Query<(&mut Transform, &Speed, &mut Formation), (With<Enemy>,)>) {
 	// for each enemy
 	for (mut tf, speed, mut formation) in query.iter_mut() {
 		let max_distance = TIME_STEP * speed.0;
@@ -176,7 +176,7 @@ fn enemy_movement(mut query: Query<(&mut Transform, &Speed, &mut Formation), Wit
 
 fn enemy_fire(
 	mut commands: Commands,
-	materials: Res<Materials>,
+	textures: Res<SpriteInfos>,
 	enemy_query: Query<&Transform, With<Enemy>>,
 ) {
 	// for each enemy shoot laser
@@ -186,7 +186,7 @@ fn enemy_fire(
 		// spawn enemy laser sprite
 		commands
 			.spawn_bundle(SpriteBundle {
-				material: materials.enemy_laser.clone(),
+				texture: textures.enemy_laser.0.clone(),
 				transform: Transform {
 					translation: Vec3::new(x, y - 15., 0.),
 					scale: Vec3::new(SCALE, -SCALE, 1.),
