@@ -2,7 +2,16 @@
 
 Simple RUST Game using the [Bevy Engine](https://bevyengine.org/)
 
-Fast dev: `cargo watch -q -c -x 'run --features bevy/dynamic'`
+### MacOS Setup
+
+- Ensure [Rust and Cargo are installed](https://www.rust-lang.org/tools/install)
+- Delete the Cargo.lock, as it may otherwise raise an error the first time: `rm Cargo.lock`
+- Install Cmake with [Homebrew](https://brew.sh/): `brew install cmake`
+- Install Cargo Watch: `cargo install cargo-watch`
+
+### Development
+
+For rapid development: `cargo watch -q -c -x 'run --features bevy/dynamic'`
 
 
 
