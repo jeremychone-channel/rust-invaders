@@ -1,126 +1,108 @@
+use crate::components::{FromPlayer, Laser, Movable, Player, SpriteSize, Velocity};
 use crate::{
-	FromPlayer, Laser, Player, PlayerReadyFire, PlayerState, Speed, SpriteInfos, WinSize,
-	PLAYER_RESPAWN_DELAY, SCALE, TIME_STEP,
+	GameTextures, PlayerState, WinSize, PLAYER_LASER_SIZE, PLAYER_RESPAWN_DELAY, PLAYER_SIZE,
+	SPRITE_SCALE,
 };
-use bevy::{core::FixedTimestep, prelude::*};
+use bevy::core::FixedTimestep;
+use bevy::prelude::*;
 
 pub struct PlayerPlugin;
 
 impl Plugin for PlayerPlugin {
 	fn build(&self, app: &mut App) {
-		app
-			.insert_resource(PlayerState::default())
-			.add_startup_stage(
-				"game_setup_actors",
-				SystemStage::single(player_spawn.system()),
-			)
-			.add_system(player_movement.system())
-			.add_system(player_fire.system())
-			.add_system(laser_movement.system())
+		app.insert_resource(PlayerState::default())
 			.add_system_set(
 				SystemSet::new()
 					.with_run_criteria(FixedTimestep::step(0.5))
-					.with_system(player_spawn.system()),
-			);
+					.with_system(player_spawn_system),
+			)
+			.add_system(player_keyboard_event_system)
+			.add_system(player_fire_system);
 	}
 }
 
-fn player_spawn(
+fn player_spawn_system(
 	mut commands: Commands,
-	sprite_infos: Res<SpriteInfos>,
-	win_size: Res<WinSize>,
-	time: Res<Time>,
 	mut player_state: ResMut<PlayerState>,
+	time: Res<Time>,
+	game_textures: Res<GameTextures>,
+	win_size: Res<WinSize>,
 ) {
 	let now = time.seconds_since_startup();
 	let last_shot = player_state.last_shot;
 
-	if !player_state.on && (last_shot == 0. || now > last_shot + PLAYER_RESPAWN_DELAY) {
+	if !player_state.on && (last_shot == -1. || now > last_shot + PLAYER_RESPAWN_DELAY) {
+		// add player
 		let bottom = -win_size.h / 2.;
 		commands
 			.spawn_bundle(SpriteBundle {
-				texture: sprite_infos.player.0.clone(),
+				texture: game_textures.player.clone(),
 				transform: Transform {
-					translation: Vec3::new(0., bottom + 75. / 4. + 5., 10.),
-					scale: Vec3::new(SCALE, SCALE, 1.),
+					translation: Vec3::new(
+						0.,
+						bottom + PLAYER_SIZE.1 / 2. * SPRITE_SCALE + 5.,
+						10.,
+					),
+					scale: Vec3::new(SPRITE_SCALE, SPRITE_SCALE, 1.),
 					..Default::default()
 				},
 				..Default::default()
 			})
 			.insert(Player)
-			.insert(PlayerReadyFire(true))
-			.insert(Speed::default());
+			.insert(SpriteSize::from(PLAYER_SIZE))
+			.insert(Movable { auto_despawn: false })
+			.insert(Velocity { x: 0., y: 0. });
 
 		player_state.spawned();
 	}
 }
 
-fn player_movement(
-	keyboard_input: Res<Input<KeyCode>>,
-	mut query: Query<(&Speed, &mut Transform), With<Player>>,
-) {
-	if let Ok((speed, mut transform)) = query.get_single_mut() {
-		let dir = if keyboard_input.pressed(KeyCode::Left) {
-			-1.
-		} else if keyboard_input.pressed(KeyCode::Right) {
-			1.
-		} else {
-			0.
-		};
-		transform.translation.x += dir * speed.0 * TIME_STEP;
-	}
-}
-
-fn player_fire(
+fn player_fire_system(
 	mut commands: Commands,
 	kb: Res<Input<KeyCode>>,
-	textures: Res<SpriteInfos>,
-	mut query: Query<(&Transform, &mut PlayerReadyFire), With<Player>>,
+	game_textures: Res<GameTextures>,
+	query: Query<&Transform, With<Player>>,
 ) {
-	if let Ok((player_tf, mut ready_fire)) = query.get_single_mut() {
-		if ready_fire.0 && kb.pressed(KeyCode::Space) {
-			let x = player_tf.translation.x;
-			let y = player_tf.translation.y;
+	if let Ok(player_tf) = query.get_single() {
+		if kb.just_pressed(KeyCode::Space) {
+			let (x, y) = (player_tf.translation.x, player_tf.translation.y);
+			let x_offset = PLAYER_SIZE.0 / 2. * SPRITE_SCALE - 5.;
 
-			let mut spawn_lasers = |x_offset: f32| {
+			let mut spawn_laser = |x_offset: f32| {
 				commands
 					.spawn_bundle(SpriteBundle {
-						texture: textures.player_laser.0.clone(),
+						texture: game_textures.player_laser.clone(),
 						transform: Transform {
 							translation: Vec3::new(x + x_offset, y + 15., 0.),
-							scale: Vec3::new(SCALE, SCALE, 1.),
+							scale: Vec3::new(SPRITE_SCALE, SPRITE_SCALE, 1.),
 							..Default::default()
 						},
 						..Default::default()
 					})
 					.insert(Laser)
 					.insert(FromPlayer)
-					.insert(Speed::default());
+					.insert(SpriteSize::from(PLAYER_LASER_SIZE))
+					.insert(Movable { auto_despawn: true })
+					.insert(Velocity { x: 0., y: 1. });
 			};
 
-			let x_offset = 144.0 / 4.0 - 5.0;
-			spawn_lasers(x_offset);
-			spawn_lasers(-x_offset);
-
-			ready_fire.0 = false;
-		}
-
-		if kb.just_released(KeyCode::Space) {
-			ready_fire.0 = true;
+			spawn_laser(x_offset);
+			spawn_laser(-x_offset);
 		}
 	}
 }
 
-fn laser_movement(
-	mut commands: Commands,
-	win_size: Res<WinSize>,
-	mut query: Query<(Entity, &Speed, &mut Transform), (With<Laser>, With<FromPlayer>)>,
+fn player_keyboard_event_system(
+	kb: Res<Input<KeyCode>>,
+	mut query: Query<&mut Velocity, With<Player>>,
 ) {
-	for (laser_entity, speed, mut laser_tf) in query.iter_mut() {
-		let translation = &mut laser_tf.translation;
-		translation.y += speed.0 * TIME_STEP;
-		if translation.y > win_size.h {
-			commands.entity(laser_entity).despawn();
+	if let Ok(mut velocity) = query.get_single_mut() {
+		velocity.x = if kb.pressed(KeyCode::Left) {
+			-1.
+		} else if kb.pressed(KeyCode::Right) {
+			1.
+		} else {
+			0.
 		}
 	}
 }

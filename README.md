@@ -1,6 +1,6 @@
-## **IMPORTANT** - 2022-01-28 - Code has been updated to **Bevy v0.6** !!!
+NEW YouTube full tutorial - [Rust Bevy - Full Tutorial - Game Dev](https://youtu.be/qo17PTfGh8Y) 
 
-Simple RUST Game using the [Bevy Engine](https://bevyengine.org/)
+Rust [Bevy](https://bevyengine.org/) v0.7 and up - Game Dev tutorials
 
 ### MacOS Setup
 
@@ -11,17 +11,19 @@ Simple RUST Game using the [Bevy Engine](https://bevyengine.org/)
 
 ### Development
 
-For rapid development: `cargo watch -q -c -x 'run --features bevy/dynamic'`
+For rapid development: 
+- `cargo run --features bevy/dynamic`
+- `cargo watch -q -c -x 'run --features bevy/dynamic'`
 
-
-
-- YouTube videos for this code base:
-    - [Episode 1](https://youtu.be/Yb3vInxzKGE) - Rust Game Development tutorial from Scratch with Bevy Engine
-    - [Episode 2](https://youtu.be/Dl4PJG0eRhg) - bi-lasers, enemy spawn, explosion animation
-    - [Episode 3](https://youtu.be/4nEUX2hf2ZI) - Enemy Approach, Formation, and Laser
 - Other Rust videos:
     - Weekly Rust Videos at [Jeremy Chone](https://www.youtube.com/jeremychone) channel
     - [Rust Game Development Tutorials](https://youtube.com/playlist?list=PL7r-PXl6ZPcCB_9zZFU0krBoGK3y5f5Vt)
+
+### Change log
+
+- 2022-05-09 - Updated to new tutorial for v0.7. See [Rust Bevy - Full Tutorial - Game Dev](https://youtu.be/qo17PTfGh8Y) 
+- 2022-01-28 - Code has been updated to **Bevy v0.6** !!!
+- 2021-06-25 - Initial (for old tutorial [Episode 1](https://youtu.be/Yb3vInxzKGE), [Episode 2](https://youtu.be/Dl4PJG0eRhg), [Episode 3](https://youtu.be/4nEUX2hf2ZI))
 
 
 ## Rust & Bevy & Other Resources

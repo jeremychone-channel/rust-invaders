@@ -1,4 +1,7 @@
 hard_tabs = true
-tab_spaces = 2
-edition = "2018"
-max_width = 100
+edition = "2021"
+max_width = 95
+chain_width = 80
+fn_call_width = 80
+single_line_if_else_max_width = 60
+struct_lit_width = 24
