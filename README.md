@@ -1,4 +1,4 @@
-NEW YouTube full tutorial - [Rust Bevy - Full Tutorial - Game Dev](https://youtu.be/qo17PTfGh8Y) 
+NEW YouTube full tutorial - [Rust Bevy - Full Tutorial - Game Dev](https://www.youtube.com/watch?v=j7qHwb7geIM&list=PL7r-PXl6ZPcCIOFaL7nVHXZvBmHNhrh_Q) 
 
 Rust [Bevy](https://bevyengine.org/) v0.7 and up - Game Dev tutorials
 
