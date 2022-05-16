@@ -1,4 +1,4 @@
-// #![allow(unused)] // silence unused warnings while exploring (to comment out)
+#![allow(unused)] // silence unused warnings while exploring (to comment out)
 
 use bevy::math::Vec3Swizzles;
 use bevy::prelude::*;
@@ -121,7 +121,7 @@ fn setup_system(
 	let (win_w, win_h) = (window.width(), window.height());
 
 	// position window (for tutorial)
-	window.set_position(IVec2::new(2780, 4900));
+	// window.set_position(IVec2::new(2780, 4900));
 
 	// add WinSize resource
 	let win_size = WinSize { w: win_w, h: win_h };
