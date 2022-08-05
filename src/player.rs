@@ -10,7 +10,7 @@ impl Plugin for PlayerPlugin {
         app.insert_resource(PlayerState::default())
             .add_system_set(
                 SystemSet::new()
-                    .with_run_criteria(FixedTimestep::step(0.5))// This was added so that player can hold space and it will shot laser every 0.2 sec!
+                    .with_run_criteria(FixedTimestep::step(0.5))
                     .with_system( player_spawn_system),
             )
             .add_system(player_keyboard_event_system)
