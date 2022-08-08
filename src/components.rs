@@ -1,6 +1,6 @@
-use bevy::core::Timer;
 use bevy::math::{Vec2, Vec3};
 use bevy::prelude::Component;
+use bevy::time::Timer;
 
 // region:    --- Common Components
 #[derive(Component)]

@@ -4,9 +4,9 @@ use crate::{
 	EnemyCount, GameTextures, WinSize, ENEMY_LASER_SIZE, ENEMY_MAX, ENEMY_SIZE, SPRITE_SCALE,
 	TIME_STEP,
 };
-use bevy::core::FixedTimestep;
 use bevy::ecs::schedule::ShouldRun;
 use bevy::prelude::*;
+use bevy::time::FixedTimestep;
 use rand::{thread_rng, Rng};
 use std::f32::consts::PI;
 

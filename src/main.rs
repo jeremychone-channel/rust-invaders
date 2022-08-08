@@ -114,7 +114,7 @@ fn setup_system(
 	mut windows: ResMut<Windows>,
 ) {
 	// camera
-	commands.spawn_bundle(OrthographicCameraBundle::new_2d());
+	commands.spawn_bundle(Camera2dBundle::default());
 
 	// capture window size
 	let window = windows.get_primary_mut().unwrap();

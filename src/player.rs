@@ -3,8 +3,8 @@ use crate::{
 	GameTextures, PlayerState, WinSize, PLAYER_LASER_SIZE, PLAYER_RESPAWN_DELAY, PLAYER_SIZE,
 	SPRITE_SCALE,
 };
-use bevy::core::FixedTimestep;
 use bevy::prelude::*;
+use bevy::time::FixedTimestep;
 
 pub struct PlayerPlugin;
 
