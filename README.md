@@ -1,6 +1,8 @@
 NEW YouTube full tutorial - [Rust Bevy - Full Tutorial - Game Dev](https://www.youtube.com/watch?v=j7qHwb7geIM&list=PL7r-PXl6ZPcCIOFaL7nVHXZvBmHNhrh_Q) 
 
-Rust [Bevy](https://bevyengine.org/) v0.7 and up - Game Dev tutorials
+Rust [Bevy](https://bevyengine.org/) - Game Dev tutorials
+
+2022-08-07 - Main branch updated to Bevy 0.8 thanks to [@DomagojRatko](https://github.com/DomagojRatko)
 
 ### MacOS Setup
 
@@ -21,6 +23,7 @@ For rapid development:
 
 ### Change log
 
+- 2022-08-07 - Main branch updated to Bevy 0.8 thanks to [@DomagojRatko](https://github.com/DomagojRatko)
 - 2022-05-09 - Updated to new tutorial for v0.7. See [Rust Bevy - Full Tutorial - Game Dev](https://www.youtube.com/watch?v=j7qHwb7geIM&list=PL7r-PXl6ZPcCIOFaL7nVHXZvBmHNhrh_Q) 
 - 2022-01-28 - Code has been updated to **Bevy v0.6** !!!
 - 2021-06-25 - Initial (for old tutorial [Episode 1](https://youtu.be/Yb3vInxzKGE), [Episode 2](https://youtu.be/Dl4PJG0eRhg), [Episode 3](https://youtu.be/4nEUX2hf2ZI))
