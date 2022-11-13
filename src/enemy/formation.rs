@@ -1,5 +1,5 @@
 use crate::{WinSize, BASE_SPEED, FORMATION_MEMBERS_MAX};
-use bevy::prelude::Component;
+use bevy::prelude::{Component, Resource};
 use rand::{thread_rng, Rng};
 
 /// Component - Enemy Formation (per enemy)
@@ -13,7 +13,7 @@ pub struct Formation {
 }
 
 /// Resource - Formation Maker
-#[derive(Default)]
+#[derive(Default, Resource)]
 pub struct FormationMaker {
 	current_template: Option<Formation>,
 	current_members: u32,

@@ -44,7 +44,7 @@ fn enemy_spawn_system(
 		let (x, y) = formation.start;
 
 		commands
-			.spawn_bundle(SpriteBundle {
+			.spawn(SpriteBundle {
 				texture: game_textures.enemy.clone(),
 				transform: Transform {
 					translation: Vec3::new(x, y, 10.),
@@ -78,7 +78,7 @@ fn enemy_fire_system(
 		let (x, y) = (tf.translation.x, tf.translation.y);
 		// spawn enemy laser sprite
 		commands
-			.spawn_bundle(SpriteBundle {
+			.spawn(SpriteBundle {
 				texture: game_textures.enemy_laser.clone(),
 				transform: Transform {
 					translation: Vec3::new(x, y - 15., 0.),
