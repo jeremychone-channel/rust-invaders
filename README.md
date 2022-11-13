@@ -2,7 +2,10 @@ NEW YouTube full tutorial - [Rust Bevy - Full Tutorial - Game Dev](https://www.y
 
 Rust [Bevy](https://bevyengine.org/) - Game Dev tutorials
 
-2022-08-07 - Main branch updated to Bevy 0.8 thanks to [@DomagojRatko](https://github.com/DomagojRatko)
+### Latest Bevy Version updates
+
+- 2022-12-13 - Updated to Bevy 0.9. Thanks to [GiulianoCTRL](https://github.com/GiulianoCTRL)
+- 2022-08-07 - Main branch updated to Bevy 0.8. Thanks to [DomagojRatko](https://github.com/DomagojRatko)
 
 ### MacOS Setup
 
@@ -10,6 +13,16 @@ Rust [Bevy](https://bevyengine.org/) - Game Dev tutorials
 - Delete the Cargo.lock, as it may otherwise raise an error the first time: `rm Cargo.lock`
 - Install Cmake with [Homebrew](https://brew.sh/): `brew install cmake`
 - Install Cargo Watch: `cargo install cargo-watch`
+
+### Fedora (Linux) requirements
+
+Ensure to have on your system with a package manager of your choice
+
+```
+dnf install rust-alsa-sys-devel
+dnf install rust-libudev-devel
+```
+Thanks to [janpauldahlke](https://github.com/janpauldahlke)
 
 ### Development
 
@@ -23,6 +36,8 @@ For rapid development:
 
 ### Change log
 
+- 2022-12-13 - Updated to Bevy 0.9. Thanks to [GiulianoCTRL](https://github.com/GiulianoCTRL)
+- 2022-08-07 - Main branch updated to Bevy 0.8. Thanks to [DomagojRatko](https://github.com/DomagojRatko)
 - 2022-08-07 - Main branch updated to Bevy 0.8 thanks to [@DomagojRatko](https://github.com/DomagojRatko)
 - 2022-05-09 - Updated to new tutorial for v0.7. See [Rust Bevy - Full Tutorial - Game Dev](https://www.youtube.com/watch?v=j7qHwb7geIM&list=PL7r-PXl6ZPcCIOFaL7nVHXZvBmHNhrh_Q) 
 - 2022-01-28 - Code has been updated to **Bevy v0.6** !!!
