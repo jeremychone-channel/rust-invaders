@@ -24,6 +24,11 @@ dnf install rust-libudev-devel
 ```
 Thanks to [janpauldahlke](https://github.com/janpauldahlke)
 
+### Browser (WebAssembly) - Gitpod
+
+<a href="https://gitpod.io/#https://github.com/mesquitaoliveira/rust-invaders.git" ><img src="https://gitpod.io/button/open-in-gitpod.svg" alt="Open in Gitpod" /><a>
+
+
 ### Development
 
 For rapid development: 
