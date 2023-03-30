@@ -3,6 +3,7 @@
 use bevy::math::Vec3Swizzles;
 use bevy::prelude::*;
 use bevy::sprite::collide_aabb::collide;
+use bevy::window::PrimaryWindow;
 use components::{
 	Enemy, Explosion, ExplosionTimer, ExplosionToSpawn, FromEnemy, FromPlayer, Laser, Movable,
 	Player, SpriteSize, Velocity,
@@ -94,12 +95,11 @@ fn main() {
 	App::new()
 		.insert_resource(ClearColor(Color::rgb(0.04, 0.04, 0.04)))
 		.add_plugins(DefaultPlugins.set(WindowPlugin {
-			window: WindowDescriptor {
-				title: "Rust Invaders!".to_string(),
-				width: 598.0,
-				height: 676.0,
+			primary_window: Some(Window {
+				title: "Rust Invaders!".into(),
+				resolution: (598., 676.).into(),
 				..Default::default()
-			},
+			}),
 			..Default::default()
 		}))
 		.add_plugin(PlayerPlugin)
@@ -117,14 +117,16 @@ fn setup_system(
 	mut commands: Commands,
 	asset_server: Res<AssetServer>,
 	mut texture_atlases: ResMut<Assets<TextureAtlas>>,
-	mut windows: ResMut<Windows>,
+	query: Query<&Window, With<PrimaryWindow>>,
 ) {
 	// camera
 	commands.spawn(Camera2dBundle::default());
 
 	// capture window size
-	let window = windows.get_primary_mut().unwrap();
-	let (win_w, win_h) = (window.width(), window.height());
+	let Ok(primary) = query.get_single() else {
+        return;
+    };
+	let (win_w, win_h) = (primary.width(), primary.height());
 
 	// position window (for tutorial)
 	// window.set_position(IVec2::new(2780, 4900));
