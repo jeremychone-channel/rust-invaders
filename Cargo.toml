@@ -5,8 +5,12 @@ edition = "2021"
 license = "MIT OR Apache-2.0"
 
 [dependencies]
-bevy = "0.9"
+bevy = "0.10"
 rand = "0.8"
 
 [workspace]
 resolver = "2" # Important! wgpu/Bevy needs this!
+
+# Enable max optimizations for dependencies, excluding rust-invaders code:
+[profile.dev.package."*"]
+opt-level = 3

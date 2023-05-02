@@ -4,18 +4,15 @@ use crate::{
 	SPRITE_SCALE,
 };
 use bevy::prelude::*;
-use bevy::time::FixedTimestep;
+use bevy::time::common_conditions::on_timer;
+use std::time::Duration;
 
 pub struct PlayerPlugin;
 
 impl Plugin for PlayerPlugin {
 	fn build(&self, app: &mut App) {
 		app.insert_resource(PlayerState::default())
-			.add_system_set(
-				SystemSet::new()
-					.with_run_criteria(FixedTimestep::step(0.5))
-					.with_system(player_spawn_system),
-			)
+			.add_system(player_spawn_system.run_if(on_timer(Duration::from_secs_f32(0.5))))
 			.add_system(player_keyboard_event_system)
 			.add_system(player_fire_system);
 	}
