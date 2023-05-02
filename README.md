@@ -1,9 +1,12 @@
 NEW YouTube full tutorial - [Rust Bevy - Full Tutorial - Game Dev](https://www.youtube.com/watch?v=j7qHwb7geIM&list=PL7r-PXl6ZPcCIOFaL7nVHXZvBmHNhrh_Q) 
 
+CODE UPDATED to **Bevy 0.10** - Thanks to [ehasnain](https://github.com/ehasnain)
+
 Rust [Bevy](https://bevyengine.org/) - Game Dev tutorials
 
 ### Latest Bevy Version updates
 
+- 2023-05-02 - Updated to Bevy 0.10. Thanks to [ehasnain](https://github.com/ehasnain)
 - 2022-12-13 - Updated to Bevy 0.9. Thanks to [GiulianoCTRL](https://github.com/GiulianoCTRL)
 - 2022-08-07 - Main branch updated to Bevy 0.8. Thanks to [DomagojRatko](https://github.com/DomagojRatko)
 
@@ -79,3 +82,6 @@ Resources:
 - Assets: 
     - [Player, Laser, Enemy Sprites](https://opengameart.org/content/space-shooter-redux)
     - [Explosion](https://opengameart.org/content/explosion)    
+
+
+[This repo](https://github.com/jeremychone-channel/rust-invaders)
