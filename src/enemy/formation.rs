@@ -36,7 +36,7 @@ impl FormationMaker {
 				let w_span = win_size.w / 2. + 100.;
 				let h_span = win_size.h / 2. + 100.;
 				let x = if rng.gen_bool(0.5) { w_span } else { -w_span };
-				let y = rng.gen_range(-h_span..h_span) as f32;
+				let y = rng.gen_range(-h_span..h_span);
 				let start = (x, y);
 
 				// compute the pivot x/y
