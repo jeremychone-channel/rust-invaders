@@ -12,9 +12,12 @@ pub struct PlayerPlugin;
 impl Plugin for PlayerPlugin {
 	fn build(&self, app: &mut App) {
 		app.insert_resource(PlayerState::default())
-			.add_system(player_spawn_system.run_if(on_timer(Duration::from_secs_f32(0.5))))
-			.add_system(player_keyboard_event_system)
-			.add_system(player_fire_system);
+			.add_systems(
+				Update,
+				player_spawn_system.run_if(on_timer(Duration::from_secs_f32(0.5))),
+			)
+			.add_systems(Update, player_keyboard_event_system)
+			.add_systems(Update, player_fire_system);
 	}
 }
 

@@ -5,8 +5,26 @@ edition = "2021"
 license = "MIT OR Apache-2.0"
 
 [dependencies]
-bevy = "0.10"
-rand = "0.8"
+rand = "0.8.5"
+
+[dependencies.bevy]
+version = "0.11.3"
+features = [
+    "bevy_asset",
+    "bevy_audio",
+    "bevy_winit",
+    "bevy_core_pipeline",
+    "bevy_sprite",
+    "bevy_text",
+    "bevy_ui",
+    "multi-threaded",
+    "png",
+    "vorbis",
+    "x11",
+    "filesystem_watcher",
+    "default_font",
+    "webgl2",
+]
 
 [workspace]
 resolver = "2" # Important! wgpu/Bevy needs this!

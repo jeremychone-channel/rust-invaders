@@ -37,7 +37,6 @@ const SPRITE_SCALE: f32 = 0.5;
 
 // region:    --- Game Constants
 
-const TIME_STEP: f32 = 1. / 60.;
 const BASE_SPEED: f32 = 500.;
 
 const PLAYER_RESPAWN_DELAY: f64 = 2.;
@@ -102,14 +101,14 @@ fn main() {
 			}),
 			..Default::default()
 		}))
-		.add_plugin(PlayerPlugin)
-		.add_plugin(EnemyPlugin)
-		.add_startup_system(setup_system)
-		.add_system(movable_system)
-		.add_system(player_laser_hit_enemy_system)
-		.add_system(enemy_laser_hit_player_system)
-		.add_system(explosion_to_spawn_system)
-		.add_system(explosion_animation_system)
+		.add_plugins(PlayerPlugin)
+		.add_plugins(EnemyPlugin)
+		.add_systems(Startup, setup_system)
+		.add_systems(Update, movable_system)
+		.add_systems(Update, player_laser_hit_enemy_system)
+		.add_systems(Update, enemy_laser_hit_player_system)
+		.add_systems(Update, explosion_to_spawn_system)
+		.add_systems(Update, explosion_animation_system)
 		.run();
 }
 
@@ -124,8 +123,8 @@ fn setup_system(
 
 	// capture window size
 	let Ok(primary) = query.get_single() else {
-        return;
-    };
+		return;
+	};
 	let (win_w, win_h) = (primary.width(), primary.height());
 
 	// position window (for tutorial)
@@ -155,13 +154,16 @@ fn setup_system(
 
 fn movable_system(
 	mut commands: Commands,
+	time: Res<Time>,
 	win_size: Res<WinSize>,
 	mut query: Query<(Entity, &Velocity, &mut Transform, &Movable)>,
 ) {
-	for (entity, velocity, mut transform, movable) in query.iter_mut() {
+	let delta = time.delta_seconds();
+
+	for (entity, velocity, mut transform, movable) in &mut query {
 		let translation = &mut transform.translation;
-		translation.x += velocity.x * TIME_STEP * BASE_SPEED;
-		translation.y += velocity.y * TIME_STEP * BASE_SPEED;
+		translation.x += velocity.x * delta * BASE_SPEED;
+		translation.y += velocity.y * delta * BASE_SPEED;
 
 		if movable.auto_despawn {
 			// despawn when out of screen
@@ -299,12 +301,12 @@ fn explosion_animation_system(
 	time: Res<Time>,
 	mut query: Query<(Entity, &mut ExplosionTimer, &mut TextureAtlasSprite), With<Explosion>>,
 ) {
-	for (entity, mut timer, mut sprite) in query.iter_mut() {
+	for (entity, mut timer, mut sprite) in &mut query {
 		timer.0.tick(time.delta());
 		if timer.0.finished() {
 			sprite.index += 1; // move to next sprite cell
 			if sprite.index >= EXPLOSION_LEN {
-				commands.entity(entity).despawn()
+				commands.entity(entity).despawn();
 			}
 		}
 	}
