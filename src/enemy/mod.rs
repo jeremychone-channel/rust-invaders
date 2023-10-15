@@ -2,7 +2,6 @@ use self::formation::{Formation, FormationMaker};
 use crate::components::{Enemy, FromEnemy, Laser, Movable, SpriteSize, Velocity};
 use crate::{
 	EnemyCount, GameTextures, WinSize, ENEMY_LASER_SIZE, ENEMY_MAX, ENEMY_SIZE, SPRITE_SCALE,
-	TIME_STEP,
 };
 
 use bevy::prelude::*;
@@ -17,9 +16,9 @@ pub struct EnemyPlugin;
 impl Plugin for EnemyPlugin {
 	fn build(&self, app: &mut App) {
 		app.insert_resource(FormationMaker::default())
-			.add_system(enemy_spawn_system.run_if(on_timer(Duration::from_secs(1))))
-			.add_system(enemy_fire_system.run_if(enemy_fire_criteria))
-			.add_system(enemy_movement_system);
+			.add_systems(Update, enemy_spawn_system.run_if(on_timer(Duration::from_secs(1))))
+			.add_systems(Update, enemy_fire_system.run_if(enemy_fire_criteria))
+			.add_systems(Update, enemy_movement_system);
 	}
 }
 
@@ -83,13 +82,18 @@ fn enemy_fire_system(
 	}
 }
 
-fn enemy_movement_system(mut query: Query<(&mut Transform, &mut Formation), With<Enemy>>) {
-	for (mut transform, mut formation) in query.iter_mut() {
+fn enemy_movement_system(
+	time: Res<Time>,
+	mut query: Query<(&mut Transform, &mut Formation), With<Enemy>>,
+) {
+	let delta = time.delta_seconds();
+
+	for (mut transform, mut formation) in &mut query {
 		// current position
 		let (x_org, y_org) = (transform.translation.x, transform.translation.y);
 
 		// max distance
-		let max_distance = TIME_STEP * formation.speed;
+		let max_distance = delta * formation.speed;
 
 		// 1 for counter clockwise, -1 clockwise
 		let dir: f32 = if formation.start.0 < 0. { 1. } else { -1. };
@@ -98,7 +102,7 @@ fn enemy_movement_system(mut query: Query<(&mut Transform, &mut Formation), With
 
 		// compute next angle (based on time for now)
 		let angle = formation.angle
-			+ dir * formation.speed * TIME_STEP / (x_radius.min(y_radius) * PI / 2.);
+			+ dir * formation.speed * delta / (x_radius.min(y_radius) * PI / 2.);
 
 		// compute target x/y
 		let x_dst = x_radius * angle.cos() + x_pivot;
@@ -108,7 +112,7 @@ fn enemy_movement_system(mut query: Query<(&mut Transform, &mut Formation), With
 		let dx = x_org - x_dst;
 		let dy = y_org - y_dst;
 		let distance = (dx * dx + dy * dy).sqrt();
-		let distance_ratio = if distance != 0. { max_distance / distance } else { 0. };
+		let distance_ratio = if distance == 0. { 0. } else { max_distance / distance };
 
 		// compute final x/y
 		let x = x_org - dx * distance_ratio;
