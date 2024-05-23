@@ -59,7 +59,7 @@ fn player_spawn_system(
 
 fn player_fire_system(
 	mut commands: Commands,
-	kb: Res<Input<KeyCode>>,
+	kb: Res<ButtonInput<KeyCode>>,
 	game_textures: Res<GameTextures>,
 	query: Query<&Transform, With<Player>>,
 ) {
@@ -93,13 +93,13 @@ fn player_fire_system(
 }
 
 fn player_keyboard_event_system(
-	kb: Res<Input<KeyCode>>,
+	kb: Res<ButtonInput<KeyCode>>,
 	mut query: Query<&mut Velocity, With<Player>>,
 ) {
 	if let Ok(mut velocity) = query.get_single_mut() {
-		velocity.x = if kb.pressed(KeyCode::Left) {
+		velocity.x = if kb.pressed(KeyCode::ArrowLeft) {
 			-1.
-		} else if kb.pressed(KeyCode::Right) {
+		} else if kb.pressed(KeyCode::ArrowRight) {
 			1.
 		} else {
 			0.

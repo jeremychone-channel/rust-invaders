@@ -8,7 +8,7 @@ license = "MIT OR Apache-2.0"
 rand = "0.8.5"
 
 [dependencies.bevy]
-version = "0.12"
+version = "0.13.2"
 features = [
     "bevy_asset",
     "bevy_audio",

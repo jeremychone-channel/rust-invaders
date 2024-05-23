@@ -1,8 +1,8 @@
 #![allow(unused)] // silence unused warnings while exploring (to comment out)
 
-use bevy::math::Vec3Swizzles;
+use bevy::math::bounding::IntersectsVolume;
+use bevy::math::{bounding::Aabb2d, Vec3Swizzles};
 use bevy::prelude::*;
-use bevy::sprite::collide_aabb::collide;
 use bevy::window::PrimaryWindow;
 use components::{
 	Enemy, Explosion, ExplosionTimer, ExplosionToSpawn, FromEnemy, FromPlayer, Laser, Movable,
@@ -58,7 +58,8 @@ struct GameTextures {
 	player_laser: Handle<Image>,
 	enemy: Handle<Image>,
 	enemy_laser: Handle<Image>,
-	explosion: Handle<TextureAtlas>,
+	explosion_layout: Handle<TextureAtlasLayout>,
+    explosion_texture: Handle<Image>,
 }
 
 #[derive(Resource)]
@@ -115,7 +116,7 @@ fn main() {
 fn setup_system(
 	mut commands: Commands,
 	asset_server: Res<AssetServer>,
-	mut texture_atlases: ResMut<Assets<TextureAtlas>>,
+	mut texture_atlases: ResMut<Assets<TextureAtlasLayout>>,
 	query: Query<&Window, With<PrimaryWindow>>,
 ) {
 	// camera
@@ -137,8 +138,8 @@ fn setup_system(
 	// create explosion texture atlas
 	let texture_handle = asset_server.load(EXPLOSION_SHEET);
 	let texture_atlas =
-		TextureAtlas::from_grid(texture_handle, Vec2::new(64., 64.), 4, 4, None, None);
-	let explosion = texture_atlases.add(texture_atlas);
+        TextureAtlasLayout::from_grid(Vec2::new(64., 64.), 4, 4, None, None);
+	let explosion_layout = texture_atlases.add(texture_atlas);
 
 	// add GameTextures resource
 	let game_textures = GameTextures {
@@ -146,7 +147,8 @@ fn setup_system(
 		player_laser: asset_server.load(PLAYER_LASER_SPRITE),
 		enemy: asset_server.load(ENEMY_SPRITE),
 		enemy_laser: asset_server.load(ENEMY_LASER_SPRITE),
-		explosion,
+		explosion_layout,
+        explosion_texture: texture_handle,
 	};
 	commands.insert_resource(game_textures);
 	commands.insert_resource(EnemyCount(0));
@@ -207,15 +209,11 @@ fn player_laser_hit_enemy_system(
 			let enemy_scale = enemy_tf.scale.xy();
 
 			// determine if collision
-			let collision = collide(
-				laser_tf.translation,
-				laser_size.0 * laser_scale,
-				enemy_tf.translation,
-				enemy_size.0 * enemy_scale,
-			);
+            let collision = Aabb2d::new(laser_tf.translation.truncate(), (laser_size.0 * laser_scale) / 2.)
+                .intersects(&Aabb2d::new(enemy_tf.translation.truncate(), (enemy_size.0 * enemy_scale) / 2.));
 
 			// perform collision
-			if collision.is_some() {
+			if collision {
 				// remove the enemy
 				commands.entity(enemy_entity).despawn();
 				despawned_entities.insert(enemy_entity);
@@ -247,15 +245,11 @@ fn enemy_laser_hit_player_system(
 			let laser_scale = laser_tf.scale.xy();
 
 			// determine if collision
-			let collision = collide(
-				laser_tf.translation,
-				laser_size.0 * laser_scale,
-				player_tf.translation,
-				player_size.0 * player_scale,
-			);
+            let collision = Aabb2d::new(laser_tf.translation.truncate(), (laser_size.0 * laser_scale) / 2.)
+                .intersects(&Aabb2d::new(player_tf.translation.truncate(), (player_size.0 * player_scale) / 2.));
 
 			// perform the collision
-			if collision.is_some() {
+			if collision {
 				// remove the player
 				commands.entity(player_entity).despawn();
 				player_state.shot(time.elapsed_seconds_f64());
@@ -281,7 +275,12 @@ fn explosion_to_spawn_system(
 		// spawn the explosion sprite
 		commands
 			.spawn(SpriteSheetBundle {
-				texture_atlas: game_textures.explosion.clone(),
+				atlas: TextureAtlas {
+                    layout: game_textures.explosion_layout.clone(),
+                    index: 0
+
+                },
+                texture: game_textures.explosion_texture.clone(),
 				transform: Transform {
 					translation: explosion_to_spawn.0,
 					..Default::default()
@@ -299,7 +298,7 @@ fn explosion_to_spawn_system(
 fn explosion_animation_system(
 	mut commands: Commands,
 	time: Res<Time>,
-	mut query: Query<(Entity, &mut ExplosionTimer, &mut TextureAtlasSprite), With<Explosion>>,
+	mut query: Query<(Entity, &mut ExplosionTimer, &mut TextureAtlas), With<Explosion>>,
 ) {
 	for (entity, mut timer, mut sprite) in &mut query {
 		timer.0.tick(time.delta());
