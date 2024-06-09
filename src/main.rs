@@ -59,7 +59,7 @@ struct GameTextures {
 	enemy: Handle<Image>,
 	enemy_laser: Handle<Image>,
 	explosion_layout: Handle<TextureAtlasLayout>,
-    explosion_texture: Handle<Image>,
+	explosion_texture: Handle<Image>,
 }
 
 #[derive(Resource)]
@@ -93,7 +93,7 @@ impl PlayerState {
 
 fn main() {
 	App::new()
-		.insert_resource(ClearColor(Color::rgb(0.04, 0.04, 0.04)))
+		.insert_resource(ClearColor(Color::srgb(0.04, 0.04, 0.04)))
 		.add_plugins(DefaultPlugins.set(WindowPlugin {
 			primary_window: Some(Window {
 				title: "Rust Invaders!".into(),
@@ -137,8 +137,7 @@ fn setup_system(
 
 	// create explosion texture atlas
 	let texture_handle = asset_server.load(EXPLOSION_SHEET);
-	let texture_atlas =
-        TextureAtlasLayout::from_grid(Vec2::new(64., 64.), 4, 4, None, None);
+	let texture_atlas = TextureAtlasLayout::from_grid(UVec2::new(64, 64), 4, 4, None, None);
 	let explosion_layout = texture_atlases.add(texture_atlas);
 
 	// add GameTextures resource
@@ -148,7 +147,7 @@ fn setup_system(
 		enemy: asset_server.load(ENEMY_SPRITE),
 		enemy_laser: asset_server.load(ENEMY_LASER_SPRITE),
 		explosion_layout,
-        explosion_texture: texture_handle,
+		explosion_texture: texture_handle,
 	};
 	commands.insert_resource(game_textures);
 	commands.insert_resource(EnemyCount(0));
@@ -209,8 +208,14 @@ fn player_laser_hit_enemy_system(
 			let enemy_scale = enemy_tf.scale.xy();
 
 			// determine if collision
-            let collision = Aabb2d::new(laser_tf.translation.truncate(), (laser_size.0 * laser_scale) / 2.)
-                .intersects(&Aabb2d::new(enemy_tf.translation.truncate(), (enemy_size.0 * enemy_scale) / 2.));
+			let collision = Aabb2d::new(
+				laser_tf.translation.truncate(),
+				(laser_size.0 * laser_scale) / 2.,
+			)
+			.intersects(&Aabb2d::new(
+				enemy_tf.translation.truncate(),
+				(enemy_size.0 * enemy_scale) / 2.,
+			));
 
 			// perform collision
 			if collision {
@@ -245,8 +250,14 @@ fn enemy_laser_hit_player_system(
 			let laser_scale = laser_tf.scale.xy();
 
 			// determine if collision
-            let collision = Aabb2d::new(laser_tf.translation.truncate(), (laser_size.0 * laser_scale) / 2.)
-                .intersects(&Aabb2d::new(player_tf.translation.truncate(), (player_size.0 * player_scale) / 2.));
+			let collision = Aabb2d::new(
+				laser_tf.translation.truncate(),
+				(laser_size.0 * laser_scale) / 2.,
+			)
+			.intersects(&Aabb2d::new(
+				player_tf.translation.truncate(),
+				(player_size.0 * player_scale) / 2.,
+			));
 
 			// perform the collision
 			if collision {
@@ -274,19 +285,20 @@ fn explosion_to_spawn_system(
 	for (explosion_spawn_entity, explosion_to_spawn) in query.iter() {
 		// spawn the explosion sprite
 		commands
-			.spawn(SpriteSheetBundle {
-				atlas: TextureAtlas {
-                    layout: game_textures.explosion_layout.clone(),
-                    index: 0
-
-                },
-                texture: game_textures.explosion_texture.clone(),
-				transform: Transform {
-					translation: explosion_to_spawn.0,
+			.spawn((
+				SpriteBundle {
+					texture: game_textures.explosion_texture.clone(),
+					transform: Transform {
+						translation: explosion_to_spawn.0,
+						..Default::default()
+					},
 					..Default::default()
 				},
-				..Default::default()
-			})
+				TextureAtlas {
+					layout: game_textures.explosion_layout.clone(),
+					index: 0,
+				},
+			))
 			.insert(Explosion)
 			.insert(ExplosionTimer::default());
 

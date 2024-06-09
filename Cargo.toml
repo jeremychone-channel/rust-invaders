@@ -8,7 +8,7 @@ license = "MIT OR Apache-2.0"
 rand = "0.8.5"
 
 [dependencies.bevy]
-version = "0.13.2"
+version = "0.14.0"
 features = [
     "bevy_asset",
     "bevy_audio",
@@ -17,7 +17,7 @@ features = [
     "bevy_sprite",
     "bevy_text",
     "bevy_ui",
-    "multi-threaded",
+    "multi_threaded",
     "png",
     "vorbis",
     "x11",
