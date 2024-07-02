@@ -31,8 +31,8 @@ Thanks to [janpauldahlke](https://github.com/janpauldahlke)
 ### Development
 
 For rapid development: 
-- `cargo run --features bevy/dynamic`
-- `cargo watch -q -c -x 'run --features bevy/dynamic'`
+- `cargo run --features bevy/dynamic_linking`
+- `cargo watch -q -c -x 'run --features bevy/dynamic_linking'`
 
 - Other Rust videos:
     - Weekly Rust Videos at [Jeremy Chone](https://www.youtube.com/jeremychone) channel
