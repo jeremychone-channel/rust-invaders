@@ -98,6 +98,8 @@ fn main() {
 			primary_window: Some(Window {
 				title: "Rust Invaders!".into(),
 				resolution: (598., 676.).into(),
+				// position window (for tutorial)
+				// position: WindowPosition::At(IVec2::new(2780, 4900)),
 				..Default::default()
 			}),
 			..Default::default()
@@ -127,9 +129,6 @@ fn setup_system(
 		return;
 	};
 	let (win_w, win_h) = (primary.width(), primary.height());
-
-	// position window (for tutorial)
-	// window.set_position(IVec2::new(2780, 4900));
 
 	// add WinSize resource
 	let win_size = WinSize { w: win_w, h: win_h };
