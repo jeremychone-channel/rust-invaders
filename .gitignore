@@ -1,4 +1,6 @@
-
+.*
 !.gitignore
+!.gitpod.yml
+!.gitpod.Dockerfile
 
 target/
