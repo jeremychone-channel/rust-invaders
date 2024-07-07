@@ -1,11 +1,10 @@
 NEW YouTube full tutorial - [Rust Bevy - Full Tutorial - Game Dev](https://www.youtube.com/watch?v=j7qHwb7geIM&list=PL7r-PXl6ZPcCIOFaL7nVHXZvBmHNhrh_Q) 
 
-CODE UPDATED to **Bevy 0.11.3** - Thanks to [juliohq](https://github.com/juliohq)
-
 Rust [Bevy](https://bevyengine.org/) - Game Dev tutorials
 
 ### Latest Bevy Version updates
 
+- 2024-06-08 - Updated to Bevy 0.14. Thanks to [Matt Woelfel](https://github.com/woelfman)
 - 2023-10-11 - Updated to Bevy 0.11.3. Thanks to [juliohq](https://github.com/juliohq)
 - 2023-05-02 - Updated to Bevy 0.10. Thanks to [ehasnain](https://github.com/ehasnain)
 - 2022-12-13 - Updated to Bevy 0.9. Thanks to [GiulianoCTRL](https://github.com/GiulianoCTRL)
