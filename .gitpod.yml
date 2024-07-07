@@ -1,0 +1,14 @@
+image:
+    file: .gitpod.Dockerfile
+
+
+tasks:
+  - name: Initial Config
+    init: sudo apt-get update && sudo apt-get install libasound2-dev  &&  sudo apt-get install libudev-dev
+    command: cargo build && rustup target install wasm32-unknown-unknown  
+    
+  - name: Browser Config
+    init: rustup target install wasm32-unknown-unknown && cargo install wasm-server-runner
+    command: export CARGO_TARGET_WASM32_UNKNOWN_UNKNOWN_RUNNER=wasm-server-runner && cargo run --target wasm32-unknown-unknown
+     
+
