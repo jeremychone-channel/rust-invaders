@@ -122,7 +122,7 @@ fn setup_system(
 	query: Query<&Window, With<PrimaryWindow>>,
 ) {
 	// camera
-	commands.spawn(Camera2dBundle::default());
+	commands.spawn(Camera2d);
 
 	// capture window size
 	let Ok(primary) = query.get_single() else {
@@ -158,7 +158,7 @@ fn movable_system(
 	win_size: Res<WinSize>,
 	mut query: Query<(Entity, &Velocity, &mut Transform, &Movable)>,
 ) {
-	let delta = time.delta_seconds();
+	let delta = time.delta_secs();
 
 	for (entity, velocity, mut transform, movable) in &mut query {
 		let translation = &mut transform.translation;
@@ -262,7 +262,7 @@ fn enemy_laser_hit_player_system(
 			if collision {
 				// remove the player
 				commands.entity(player_entity).despawn();
-				player_state.shot(time.elapsed_seconds_f64());
+				player_state.shot(time.elapsed_secs_f64());
 
 				// remove the laser
 				commands.entity(laser_entity).despawn();
@@ -285,18 +285,15 @@ fn explosion_to_spawn_system(
 		// spawn the explosion sprite
 		commands
 			.spawn((
-				SpriteBundle {
-					texture: game_textures.explosion_texture.clone(),
-					transform: Transform {
-						translation: explosion_to_spawn.0,
-						..Default::default()
-					},
+				Sprite {
+					image: game_textures.explosion_texture.clone(),
+					texture_atlas: Some(TextureAtlas {
+						layout: game_textures.explosion_layout.clone(),
+						index: 0,
+					}),
 					..Default::default()
 				},
-				TextureAtlas {
-					layout: game_textures.explosion_layout.clone(),
-					index: 0,
-				},
+				Transform::from_translation(explosion_to_spawn.0),
 			))
 			.insert(Explosion)
 			.insert(ExplosionTimer::default());
@@ -309,14 +306,16 @@ fn explosion_to_spawn_system(
 fn explosion_animation_system(
 	mut commands: Commands,
 	time: Res<Time>,
-	mut query: Query<(Entity, &mut ExplosionTimer, &mut TextureAtlas), With<Explosion>>,
+	mut query: Query<(Entity, &mut ExplosionTimer, &mut Sprite), With<Explosion>>,
 ) {
 	for (entity, mut timer, mut sprite) in &mut query {
 		timer.0.tick(time.delta());
 		if timer.0.finished() {
-			sprite.index += 1; // move to next sprite cell
-			if sprite.index >= EXPLOSION_LEN {
-				commands.entity(entity).despawn();
+			if let Some(texture) = sprite.texture_atlas.as_mut() {
+				texture.index += 1;
+				if texture.index >= EXPLOSION_LEN {
+					commands.entity(entity).despawn();
+				}
 			}
 		}
 	}

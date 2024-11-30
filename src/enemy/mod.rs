@@ -35,15 +35,14 @@ fn enemy_spawn_system(
 		let (x, y) = formation.start;
 
 		commands
-			.spawn(SpriteBundle {
-				texture: game_textures.enemy.clone(),
-				transform: Transform {
+			.spawn((
+				Sprite::from_image(game_textures.enemy.clone()),
+				Transform {
 					translation: Vec3::new(x, y, 10.),
 					scale: Vec3::new(SPRITE_SCALE, SPRITE_SCALE, 1.),
 					..Default::default()
 				},
-				..Default::default()
-			})
+			))
 			.insert(Enemy)
 			.insert(formation)
 			.insert(SpriteSize::from(ENEMY_SIZE));
@@ -65,15 +64,14 @@ fn enemy_fire_system(
 		let (x, y) = (tf.translation.x, tf.translation.y);
 		// spawn enemy laser sprite
 		commands
-			.spawn(SpriteBundle {
-				texture: game_textures.enemy_laser.clone(),
-				transform: Transform {
+			.spawn((
+				Sprite::from_image(game_textures.enemy_laser.clone()),
+				Transform {
 					translation: Vec3::new(x, y - 15., 0.),
 					rotation: Quat::from_rotation_x(PI),
 					scale: Vec3::new(SPRITE_SCALE, SPRITE_SCALE, 1.),
 				},
-				..Default::default()
-			})
+			))
 			.insert(Laser)
 			.insert(SpriteSize::from(ENEMY_LASER_SIZE))
 			.insert(FromEnemy)
@@ -86,7 +84,7 @@ fn enemy_movement_system(
 	time: Res<Time>,
 	mut query: Query<(&mut Transform, &mut Formation), With<Enemy>>,
 ) {
-	let delta = time.delta_seconds();
+	let delta = time.delta_secs();
 
 	for (mut transform, mut formation) in &mut query {
 		// current position
