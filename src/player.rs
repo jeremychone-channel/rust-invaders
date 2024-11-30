@@ -28,16 +28,16 @@ fn player_spawn_system(
 	game_textures: Res<GameTextures>,
 	win_size: Res<WinSize>,
 ) {
-	let now = time.elapsed_seconds_f64();
+	let now = time.elapsed_secs_f64();
 	let last_shot = player_state.last_shot;
 
 	if !player_state.on && (last_shot == -1. || now > last_shot + PLAYER_RESPAWN_DELAY) {
 		// add player
 		let bottom = -win_size.h / 2.;
 		commands
-			.spawn(SpriteBundle {
-				texture: game_textures.player.clone(),
-				transform: Transform {
+			.spawn((
+				Sprite::from_image(game_textures.player.clone()),
+				Transform {
 					translation: Vec3::new(
 						0.,
 						bottom + PLAYER_SIZE.1 / 2. * SPRITE_SCALE + 5.,
@@ -46,8 +46,7 @@ fn player_spawn_system(
 					scale: Vec3::new(SPRITE_SCALE, SPRITE_SCALE, 1.),
 					..Default::default()
 				},
-				..Default::default()
-			})
+			))
 			.insert(Player)
 			.insert(SpriteSize::from(PLAYER_SIZE))
 			.insert(Movable { auto_despawn: false })
@@ -70,15 +69,14 @@ fn player_fire_system(
 
 			let mut spawn_laser = |x_offset: f32| {
 				commands
-					.spawn(SpriteBundle {
-						texture: game_textures.player_laser.clone(),
-						transform: Transform {
+					.spawn((
+						Sprite::from_image(game_textures.player_laser.clone()),
+						Transform {
 							translation: Vec3::new(x + x_offset, y + 15., 0.),
 							scale: Vec3::new(SPRITE_SCALE, SPRITE_SCALE, 1.),
 							..Default::default()
 						},
-						..Default::default()
-					})
+					))
 					.insert(Laser)
 					.insert(FromPlayer)
 					.insert(SpriteSize::from(PLAYER_LASER_SIZE))

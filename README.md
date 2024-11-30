@@ -4,6 +4,7 @@ Rust [Bevy](https://bevyengine.org/) - Game Dev tutorials
 
 ### Latest Bevy Version updates
 
+- `2024-11-29` - Updated to Bevy 0.15. Thanks to [Matt Woelfel](https://github.com/woelfman)
 - `2024-06-08` - Updated to Bevy 0.14. Thanks to [Matt Woelfel](https://github.com/woelfman)
 - `2024-05-23` - Updated to Bevy 0.12 & 0.13. Thanks to [Vinzenz Schroeter (@kaesaecracker)](https://github.com/kaesaecracker)
 - `2023-10-11` - Updated to Bevy 0.11.3. Thanks to [juliohq](https://github.com/juliohq)
